@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset='utf-8'/>
+        <style>
+            #canvas {
+                top: 0;
+                left: 0;
+            }
+            canvas {
+                position: absolute;
+                border: 1px solid #333;
+                background: transparent;
+            }
+
+            #ballsCanvas {
+                border: 1px dotted #cecece;
+            }
+
+            .columns {
+                width: 50%;
+                float: left;
+                position: relative;
+            }
+
+            /*  */
+
+            #layer1, #layer2 {
+                top: 250px;
+                border-color: blueviolet;
+            }
+            #layer2 {
+                top: 255px;
+                left: 5px;
+                border-color: goldenrod;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="columns">
+            <div>
+                <button id='but'>Add line</button>
+                <button id='clearbut'>Clear</button>
+            </div>
+
+            <canvas id="canvas" width='500px' height='700px'></canvas>
+        </div>
+        <div class="columns">
+            <h1>TODO:</h1>
+            <ul>
+                <li>Move this thing to github</li>
+                <li>Move moving ball and trajectory to a separate canvas</li>
+                <li>Improve the "engine". Sometimes the ball goes through the block</li>
+                <li>Looks like speed depends fully on X difference</li>
+                <li>Snap a picture and redraw this second canvas with</li>
+            </ul>
+
+            <hr/>
+
+            <!-- <canvas id="layer1" width='200px' height='200px'></canvas>
+            <canvas id="layer2" width='200px' height='200px'></canvas> -->
+
+            <hr/>
+
+            <p>Information:</p>
+            <p>Ball y: <span id='ballY'></span></p>
+            <p>Ball x: <span id='ballX'></span></p>
+            <p>Height: <span id='canHeight'></span></p>
+            <p>Height+Rad: <span id='canHeightRad'></span></p>
+
+        </div>
+       
+        <!-- <script>
+            var canvas1 = document.getElementById('layer1');
+            var canvas2 = document.getElementById('layer2');
+            var ctx1 = canvas1.getContext('2d');
+            var ctx2 = canvas2.getContext('2d');
+            var cWidth = canvas1.clientWidth;
+            var cHeight = canvas1.clientHeight;
+
+            ctx1.rect(10,10,100,100);
+            ctx1.fillStyle = 'blueviolet'
+            ctx1.fill();
+
+
+            ctx2.rect(10,10,100,100);
+            ctx2.fillStyle = 'goldenrod'
+            ctx2.fill();
+
+            var x = 0;
+            var y = 0;
+            setInterval(function(){
+                x++;
+                y++;
+
+                ctx2.rect(0,0,cWidth,cHeight);
+                ctx2.fillStyle = 'transparent';
+                ctx2.fill();
+
+            }, 3000);
+
+        </script> -->
+
+        <script type='text/javascript' src='painterService.js'></script>
+        <script type='text/javascript' src='main.js'></script>
+    </body>
+</html>
