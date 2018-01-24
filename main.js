@@ -3,15 +3,22 @@
     var ctx = canvas.getContext('2d');
     var cWidth = canvas.clientWidth;
     var cHeight = canvas.clientHeight;
+    var imageData = null; 
+    
   
     var painter = Painter(ctx);
 
     var squaresPerLine = 7;
     var squareMargin = 10;
-    var level = 10; // level go up every 5 user actions
     var squareSize = (cWidth / squaresPerLine) - (squareMargin * 1.1);
     var numberOfLines = Math.floor(cHeight / (squareSize + squareMargin));
-    
+    var points = 1;
+    var numberOfBalls = null;
+    var level = null; 
+    var step = 1;
+    var ballsIncrement = 5;
+    var levelIncrement = 10;
+
     var grid = []; //do we need to make it 2 demensional?
     var squares = [];
     var basicColors = [
@@ -65,27 +72,53 @@
     // }
     
     forward();
-    forward();
-    forward();
-    forward();
-    
+   var first = true; 
     function forward(){
+
+      numberOfBalls = Math.ceil(points / ballsIncrement);
+      level = Math.ceil(points / levelIncrement);
+
+      document.getElementById('level').innerHTML = level;
+      document.getElementById('balls').innerHTML = numberOfBalls;
+
       var newSquares = prepareNewLine(level, squaresPerLine);
       // console.log('1')
       moveExistingSquaresDown(squares, squaresPerLine);
       // console.log('3')
+      // console.log('newSquares: ', newSquares.slice());
+      // console.log('squares: ', squares.slice());
+
       insertNewLine(newSquares, squares);
+
       // console.log('5')
       drawSquares(squares);
     }
     
-    function moveExistingSquaresDown(squares, squaresPerLine){
-      for (var i = squares.length - 1; i >= 0; i--){
-        if (squares[i]){
+
+
+
   
-          squares[i].y = grid[i + squaresPerLine].y;
+    //TODO need to figure out what is going on here????
+    //HOW DO WE GRADUALLY GOING DOWN ONE step at a time
+    //and withouth care if its null or not///
+    function moveExistingSquaresDown(squares, squaresPerLine){
+
+      console.log('movedown')
+
+      console.log('for repeat ', squaresPerLine * step)
+
+      for (var i = squaresPerLine * step; i >= 0; i--){
+        if (squares[i]){
+          // console.log('i: ', i);
+          console.log('step: ', step);
+          console.log('squaresPerLine:', squaresPerLine);
+          console.log('move to:', grid[step + squaresPerLine].y);
+          squares[i].y = grid[step + squaresPerLine].y;
         }
       }
+      
+      step++;
+
       clearCanvas();
     }
     
@@ -163,7 +196,11 @@
     function drawSquare(square){
       ctx.fillStyle = square.color;
       ctx.fillRect(square.x, square.y, square.size, square.size);
-      writeNumber(square.number,square.x + squareSize / 2.4, square.y + squareSize / 1.8)
+
+      var xOffset = square.number > 10 ? 2.6 : 2.4;
+      var yOffset = 1.8;
+
+      writeNumber(square.number,square.x + squareSize / xOffset, square.y + squareSize / yOffset)
     }
     
     function writeNumber(number,x,y){
@@ -214,10 +251,13 @@
           }
         }
       
+        //Move ball until it hits bottom border
         function makeMovingBall(balls){
           
           var movingSpeed = 1;
-          
+          var ballIsMovingDown = null;
+          var ballTouchedBottomBorder = null;
+          var interval = null;
           var timeoutS = 0;
           
            balls.forEach(function(ball){
@@ -225,19 +265,35 @@
    
             setTimeout(function(){
               
-              var interval = setInterval(function(){
+              interval = setInterval(function(){
                
                 calculatePosition(ball, squares);
-                if ((ball.y >= cHeight - radius + 1) || (ball.y > cHeight - radius)) {
 
-                  // console.log('b.y: ' + ball.y + '-' + (cHeight + radius));
+                ballIsMovingDown = ball.yDirectionStep > 0;
 
-                    clearInterval(interval);
+                var bottomBorder = cHeight - radius;
 
-                    // ball.y = cHeight - radius  - 1;
+                if (ballIsMovingDown) {
 
-                    console.log('STOPPED');
-                    
+                  ballTouchedBottomBorder  = ball.y >= bottomBorder;
+
+                  if (ballTouchedBottomBorder) {
+
+                    // console.log('b.y: ' + ball.y + '-' + (cHeight + radius));
+
+                      clearInterval(interval);
+
+                      ball.y = bottomBorder; //if close move down/up to match border
+
+                      forward();
+
+
+                      //Update image
+                      imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
+
+                      console.log('STOPPED');
+                      
+                  }
                 }
                 drawBasicBall(ball, 'green');
 
@@ -252,6 +308,20 @@
   
            });
   
+        }
+         
+        function drawTrajectory(ball, distance){
+
+          var coords = {
+            x: ball.x,
+            y: ball.y
+          };
+
+          for (var i = 0; i < distance; i++) {
+            coords.x =  coords.x + (ball.xDirectionStep * 10); 
+            coords.y =  coords.y + (ball.yDirectionStep * 10);
+            drawBasicBall(coords, 'rgba(0,0,0,.1)')
+          }
         }
 
         function fireTheBall(){
@@ -286,10 +356,10 @@
           ctx.fillStyle = color;
           ctx.fill();
           
-          ctx.beginPath();
-          ctx.arc(x,y, 2, 0, 2 * Math.PI, false);
-          ctx.fillStyle = 'black';
-          ctx.fill();
+          // ctx.beginPath();
+          // ctx.arc(x,y, 2, 0, 2 * Math.PI, false);
+          // ctx.fillStyle = 'black';
+          // ctx.fill();
           // ctx.lineWidth = 1;
           // ctx.strokeStyle = '#003300';
           // ctx.stroke();
@@ -297,48 +367,87 @@
     
     //##############Bouncing off a block/wall
     function calculatePosition(ball, squares) {
+      
       var allLines = getAllLines(squares);
       var relevantSurfaces = getRelevantSurfaces(ball.yDirectionStep,ball.xDirectionStep, allLines);
-      ///TODO
-      //always go down eventually
-      // console.log('calling here');
-      
+
       //MOVEHERE
       moveY(ball, relevantSurfaces);
       moveX(ball, relevantSurfaces);
     }
     
+    var ballHitsTopBorder = null;
+    var ballHitsBottomBorder = null;
+    var ballIsMovingDown = ball.yDirectionStep > 0;
+    var ballIsMovingUp = ball.yDirectionStep < 0;
+
     function moveY(ball, surfaces) {
       eraseBasicBall(ball);
   
       //detect border
-      ball.yDirectionStep = ball.y <= 0 + radius || ball.y >= cHeight - radius ? ball.yDirectionStep * -1 : ball.yDirectionStep;
+      ballIsMovingDown = ball.yDirectionStep > 0;
+      ballIsMovingUp = ball.yDirectionStep < 0;
+      ballHitsTopBorder = ball.y <= 0 + radius;
+      ballhitsBottomBorder = ball.y >= cHeight - radius;
+
+
+      ball.yDirectionStep =  (ballIsMovingUp && ballHitsTopBorder)|| (ballIsMovingDown && ballHitsBottomBorder) ? ball.yDirectionStep * -1 : ball.yDirectionStep;
       
       //detect surface
       surfaces.forEach( s => {
+
         //we calculrate bl for now, but when ball moves bottom we need tl (bl wont exist)
-        if (s.bl && ball.x > s.bl.x1 && ball.x < s.bl.x2) { // ball inside square X lines
-          if (ball.y <= s.bl.y1 + radius && ball.y + radius > s.bl.y1) {
-            ball.yDirectionStep *= -1
+        //Ball is moving up
 
-            //for bl X is the same as square, Y is minus square size
-            hitSquare(s.bl.x1, s.bl.y1 - squareSize);
+        if (s.bl) { 
 
+          var ballRightSideIsUnderSquare = ball.x + radius > s.bl.x1;
+          var ballLeftSideIsUnderSquare = ball.x - radius < s.bl.x2;
+
+          if (ballRightSideIsUnderSquare && ballLeftSideIsUnderSquare) { // ball is under a square in between squares X1 and X2 
+
+            var ballTopSideHitsSquare = ball.y - radius <= s.bl.y1;
+            var ballIsCloseToTheBottomSide = ball.y > s.bl.y1;
+
+            if (ballTopSideHitsSquare && ballIsCloseToTheBottomSide) {
+
+              drawLine(s.bl)
+
+              ball.yDirectionStep *= -1
+
+              //for bl X is the same as square, Y is minus square size
+              hitSquare(s.bl.x1, s.bl.y1 - squareSize);
+
+            }
           }
         }
-        
-        if (s.tl && ball.x > s.tl.x1 - radius && ball.x < s.tl.x2) { // ball inside square X lines   
-          if (ball.y + radius >= s.tl.y1 && ball.y < s.tl.y1) {
-            ball.yDirectionStep *= -1                       
 
-            //for top line x1 and y1 coresponds with the square coords
-            hitSquare(s.tl.x1, s.tl.y1);
+        //ball is moving down
+
+        if (s.tl) {
+          var ballRightSideIsAboveSquare = ball.x + radius > s.tl.x1;
+          var ballLeftSideIsAboveSquare = ball.x - radius < s.tl.x2;
+          
+          if (ballRightSideIsAboveSquare && ballLeftSideIsAboveSquare) {   
+
+            var ballBottomSideHitsSquare = ball.y + radius >= s.tl.y1;
+            var ballCenterCloseToTopSquare = ball.y < s.tl.y1;
+
+            if (ballBottomSideHitsSquare && ballCenterCloseToTopSquare) {
+
+              drawLine(s.tl)
+
+              ball.yDirectionStep *= -1                       
+
+              //for top line x1 and y1 coresponds with the square coords
+              hitSquare(s.tl.x1, s.tl.y1);
+            }
           }
+          
         }
-        
-        if (ball.yDirectionStep > cHeight) {
-          ball.yDirectionStep = cHeihgt - radius;
-        }
+        // if (ball.yDirectionStep > cHeight) {
+        //   ball.yDirectionStep = cHeihgt - radius;
+        // }
       });
       
       ball.y = ball.y + ball.yDirectionStep;
@@ -354,17 +463,41 @@
       surfaces.forEach( s => {
 
         //we calculrate bl for now, but when ball moves bottom we need tl (bl wont exist)
-        if (s.ll && ball.y > s.ll.y2 && ball.y < s.ll.y1) { // ball inside square Y lines
-          if (ball.x <= s.ll.x1 - radius) {
-            ball.xDirectionStep *= -1;
+        //Ball is moving to right
 
-            //for left line x1 and y1 corespondes with the square coords
-            hitSquare(s.ll.x1, s.ll.y1 - squareSize);
+        if (s.ll){ 
+
+          var ballTopSideAboveSquareBottomSide = ball.y - radius < s.ll.y1;
+          var ballBottomSideBelowSquareTopSide = ball.y + radius > s.ll.y2;
+
+          if (ballTopSideAboveSquareBottomSide && ballBottomSideBelowSquareTopSide) { // ball is to the left from the square //y2 - top, y1 - bottom
+          
+            var ballRightSideHitsSquareLeftSide = ball.x + radius >= s.ll.x1;
+            var ballCenterHasntPassedSquareLeftSide = ball.x < s.ll.x1;
+
+            if (ballRightSideHitsSquareLeftSide && ballCenterHasntPassedSquareLeftSide) {
+
+              drawLine(s.ll);
+
+              ball.xDirectionStep *= -1;
+
+              //for left line x1 and y1 corespondes with the square coords
+              //ball hits left side of a square 
+              hitSquare(s.ll.x1, s.ll.y1 - squareSize);
+            }
           }
         }
      
         if (s.rl && ball.y < s.rl.y2 && ball.y > s.rl.y1) { // ball inside square Y lines
-          if (ball.x == s.rl.x1 || (ball.x - radius < s.rl.x1 && ball.x + radius > s.rl.x1)){
+
+
+          //Ball is moving to the left
+          // we need to see if left x (x - radius), hits or passes right line
+
+          if (ball.x - radius <= s.rl.x1 && ball.x > s.rl.x1){
+
+            drawLine(s.rl);
+
             ball.xDirectionStep *= -1;
 
             //for right line x1 minus square size, and y is good
@@ -377,6 +510,11 @@
     }
 
     function hitSquare(x,y){
+
+        points++;
+
+        document.getElementById('points').innerHTML = points;
+
         squares
             .filter(sqr => sqr !== null)
             .filter(sqr => {
@@ -410,6 +548,9 @@
               rl: {x1: square.x + square.size,x2: square.x + square.size,y1: square.y,y2: square.y + square.size}            
             };
           }
+        })
+        .filter(square => {
+          return square !== undefined;
         })
       }
     
@@ -474,22 +615,27 @@
     }
     
     
-    
-    
     createBallsArray(1, ball);
     // makeMovingBall(balls);
+
+    var mouseIsDown = false;
 
     let mouseStart, mouseEnd;
     setMouseEventListener();
     function setMouseEventListener(){
+
+        imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
 
         //Coordinates of the mouse drag motion to determine direction of the ball
         mouseStart = {x:0, y:0};
         mouseEnd = {x:0, y:0};
 
         document.addEventListener('mousedown', (e) => {
-            mouseStart.x = e.x;
-            mouseStart.y = e.y;
+            mouseIsDown = true;
+
+            mouseStart.x = e.offsetX;
+            mouseStart.y = e.offsetY;
+
             ctx.strokeStyle = 'blue';
             
             goodToGo = true;
@@ -499,95 +645,80 @@
         });
 
         document.addEventListener('mouseup', (e) => {
+            mouseIsDown = false;
             mouseEnd.x = e.x;
             mouseEnd.y = e.y;
 
             goodToGo = false;
 
+            document.removeEventListener("mousemove", drawLinesOnMove);
+            ctx.putImageData(imageData, 0, 0);
+
             updateBallDirection(mouseStart, mouseEnd);
             makeMovingBall(balls);
 
-            document.removeEventListener("mousemove", drawLinesOnMove)
         });
 
     }
 
     function updateBallDirection(start, end){
         balls.forEach( ball => {
-            //x can be from 0 to  canvas width
-            //y can be from 0 to canvas height
-            // mouseStart.x mouseStart.y
-            // x = mouseStart - mouseEnd 
-            //distance between x1 and x2 devided by how many ballsizes in y
+            var xSpeed = Math.abs(start.x - end.x) / radius; //how many balls can fit into this 
+            var xDirection = start.x < end.x ? -1 : 1; //to left or to right
+            var ySpeed = Math.abs(start.y - end.y) / radius;
 
-            //Works at least somehow
-            // var distanceBetweenX1andX2 = Math.abs(start.x - end.x) / radius; //how many balls can fit into this 
-            // ball.xDirectionStep = distanceBetweenX1andX2 / (start.y / radius * 2);
+            //Dont allow the ball to move too fast
+            if (xSpeed > 2) {
+              xSpeed = 2;
+            }
 
-            var speed = Math.abs(start.x - end.x) / radius; //how many balls can fit into this 
+            //Dont allow the ball to move too fast
+            if (ySpeed > 2) {
+              ySpeed = 2;
+            }
 
-            var direction = start.x < end.x ? -1 : 1; //to left or to right
+            //Dont allow user to get too low angle
+            if (ySpeed < 0.12) {
+              ySpeed = 0.12;
+            } 
 
-            // if (speed > 3) {
-            //   speed = 3;
-            // } else if (speed < 1) {
-            //   speed = 1;
-            // }
+            ball.xDirectionStep = (xSpeed * xDirection);
+            ball.yDirectionStep = ySpeed * (- 1);
 
-            ball.xDirectionStep = (speed * direction);
-            // ball.yDirectionStep = Math.round(speed * (- 1));
-
-            // if (ball.y - radius*2  >= cHeight) {
-            //   ball.yDirectionStep = -1;
-
-            // }
-
-            console.log(ball);
-
-            // var speed = start.x - end.x;
-
-            // var direction = ball.x - start.x;
-
-            // ball.xDirectionStep = direction / (start.y / radius * 2);
-            // ball.xDirectionStep = (start.y / radius * 2) / direction;
-            
-
+            // console.log(ball);
         });
     }
 
-
-    var ps = {x:0,y:0};
-    var cs = {x:0,y:0};
-    
-    var imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
-    
-    var img = document.createElement("img");
-    img.src = canvas.toDataURL("image/png");
-    
     var goodToGo = false;
-    var ps = {x1:0, x2:0,y1:0,y2:0};
     
+    //We need to get ball position
+    //calculate difference between ball position and end of mouse 
+    //remove this difference from start and end of mmouse
     
     function drawLinesOnMove(e) {
-      if (goodToGo){
+      if (goodToGo && mouseIsDown){
 
-        //erase previous
-        painter.drawLine({
-          width: '2',
-          color: 'white',
-          start: { x: ps.x1, y: ps.y1 },
-          end: { x: ps.x2, y: ps.y2 }
-        })
+        ctx.putImageData(imageData, 0, 0);
+        updateBallDirection(mouseStart, {x: e.x, y: e.y});
+        // console.log('draw traj');
+        drawTrajectory(balls[0], 10);
 
-        ps = {x1: balls[0].x, x2: e.x, y1: balls[0].y, y2: e.y};
+        // var xD = mouseStart.x - e.offsetX;
+        // var yD = mouseStart.y - e.offsetY;
 
-        //draw new
-        painter.drawLine({
-          width: '1',
-          color: 'black',
-          start: { x: balls[0].x, y: balls[0].y},
-          end: { x: e.x, y: e.y }
-        });
+        // var eX = balls[0].x + xD;
+        // var eY = balls[0].y + yD;
+
+        // var sX = balls[0].x;
+        // var sY = balls[0].y;
+
+        // //draw new
+        // painter.drawLine({
+        //   width: '1',
+        //   color: 'black',
+        //   start: { x:  eX, y: eY },
+        //   end: { x: sX, y: sY}
+        // });
 
         goodToGo = false;
         
@@ -597,5 +728,4 @@
       }
     }
     
-
   })();
