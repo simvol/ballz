@@ -17,7 +17,7 @@
     var level = null; 
     var step = 1;
     var ballsIncrement = 5;
-    var levelIncrement = 10;
+    var levelIncrement = 5;
 
     var grid = []; //do we need to make it 2 demensional?
     var squares = [];
@@ -62,10 +62,18 @@
       
       // prepareSquares(grid);
     }
-    
-    // document.getElementById('but').addEventListener('click', function(){
-    //   forward();
-    // });
+   
+    function restart() {
+      points = 1;
+      numberOfBalls = null;
+      level = null; 
+      step = 1;
+      squares = [];
+    }
+
+    document.getElementById('but').addEventListener('click', function(){
+      forward();
+    });
     
     // for (var i = 0; i < numberOfLines; i++){
     //   forward();
@@ -107,21 +115,30 @@
 
       console.log('for repeat ', squaresPerLine * step)
 
-      for (var i = squaresPerLine * step; i >= 0; i--){
+      for (var i = squares.length; i >= 0; i--){
+      // for (var i = squaresPerLine * step; i >= 0; i--){
         if (squares[i]){
           // console.log('i: ', i);
-          console.log('step: ', step);
-          console.log('squaresPerLine:', squaresPerLine);
-          console.log('move to:', grid[step + squaresPerLine].y);
-          squares[i].y = grid[step + squaresPerLine].y;
+          // console.log('step: ', step);
+          // console.log('squaresPerLine:', squaresPerLine);
+          // console.log('move to:', grid[step + squaresPerLine].y);
+          if (grid[i + squaresPerLine]){
+            squares[i].y = grid[i + squaresPerLine].y;
+          } else {
+            if (squares && squares.length > 0){
+              document.getElementById('score').innerHTML = 'Game Over. Your score is: ' + points;
+              restart();
+            }
+          }
         }
       }
+
       
       step++;
 
       clearCanvas();
     }
-    
+
     function insertNewLine(newSquares, allSquares){
       //go backwards because we dont' want to change order of the new line
       for (var i = newSquares.length - 1; i >= 0; i--){
@@ -516,14 +533,17 @@
         document.getElementById('points').innerHTML = points;
 
         squares
-            .filter(sqr => sqr !== null)
+            // .filter(sqr => sqr !== null)
             .filter(sqr => {
+              if (sqr !==null) {
                 return Math.floor(sqr.x) === Math.floor(x) && Math.floor(sqr.y) === Math.floor(y);
+              }
             })
             .map(result => {
                 result.number--;
+                result.color = getSquareColor(result.number);
                 if(result.number === 0) {
-                    deleteSquare();
+                  deleteSquare();
                 }
             });
         
@@ -531,7 +551,15 @@
     }
 
     function deleteSquare() {
-        squares = squares.filter(s => s && s.number > 0);
+        squares = squares.map(s => {
+            if (s && s.number > 0) {
+              return s;
+            } else {
+              return null;
+
+            }
+          }
+        );
     }
     
     //we need to get lines x1-----x2 then see if ball x >x1 and <x2
