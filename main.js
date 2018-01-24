@@ -63,9 +63,9 @@
       // prepareSquares(grid);
     }
     
-    document.getElementById('but').addEventListener('click', function(){
-      forward();
-    });
+    // document.getElementById('but').addEventListener('click', function(){
+    //   forward();
+    // });
     
     // for (var i = 0; i < numberOfLines; i++){
     //   forward();
