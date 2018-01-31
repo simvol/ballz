@@ -44,7 +44,7 @@
       // grid = cWidth
       var x = 0;
       var y = 0;
-      ctx.font = "15px Arial";
+      // ctx.font = "15px Arial";
       
       for (var horizontalLine = 0; horizontalLine < numberOfLines; horizontalLine++) {
   

@@ -3,12 +3,7 @@
     <head>
         <meta charset='utf-8'/>
         <style>
-            /* #canvas {
-                top: 0;
-                left: 0;
-            } */
             canvas {
-                /* position: absolute; */
                 border: 1px solid #333;
                 background: transparent;
             }
@@ -73,39 +68,15 @@
 
 
         </div>
-       
-        <!-- <script>
-            var canvas1 = document.getElementById('layer1');
-            var canvas2 = document.getElementById('layer2');
-            var ctx1 = canvas1.getContext('2d');
-            var ctx2 = canvas2.getContext('2d');
-            var cWidth = canvas1.clientWidth;
-            var cHeight = canvas1.clientHeight;
 
-            ctx1.rect(10,10,100,100);
-            ctx1.fillStyle = 'blueviolet'
-            ctx1.fill();
+        <!-- <script type='text/javascript' src='painterService.js'></script> -->
+        <!-- <script type='text/javascript' src='main.js'></script> -->
 
-
-            ctx2.rect(10,10,100,100);
-            ctx2.fillStyle = 'goldenrod'
-            ctx2.fill();
-
-            var x = 0;
-            var y = 0;
-            setInterval(function(){
-                x++;
-                y++;
-
-                ctx2.rect(0,0,cWidth,cHeight);
-                ctx2.fillStyle = 'transparent';
-                ctx2.fill();
-
-            }, 3000);
-
-        </script> -->
-
-        <script type='text/javascript' src='painterService.js'></script>
-        <script type='text/javascript' src='main.js'></script>
+        <script type='text/javascript' src='ts/interfaces.js'></script>
+        <script type='text/javascript' src='ts/Painter.js'></script>
+        <script type='text/javascript' src='ts/Ball.js'></script>
+        <script type='text/javascript' src='ts/Grid.js'></script>
+        <script type='text/javascript' src='ts/Mover.js'></script>
+        <script type='text/javascript' src='ts/main.js'></script>
     </body>
 </html>
