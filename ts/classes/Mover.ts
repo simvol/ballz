@@ -135,17 +135,10 @@ class Mover {
 
     private hitSquare(square){
 
-        //TODO START HERE
-        //Change square number,
-        //Remove square
-        //Change square color
-
-        //>>>>>
         square.number--;
-        if (square.null <= 0) {
+        if (square.number <= 0) {
             square = null;
         }
-        console.log('hit square', square);
     }
 
     private getPlaygroundHits(

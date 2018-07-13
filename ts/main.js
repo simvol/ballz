@@ -68,6 +68,12 @@ function startGame(level) {
             painter.drawSquare(s);
         }
     });
+    //TODO START HERE
+    //Change square number,
+    //Remove square
+    //Change square color
+    //>>>>>
+    //we need to redraw squares on each squareHit
     mover.startMoving([ball], squares);
 }
 //# sourceMappingURL=main.js.map

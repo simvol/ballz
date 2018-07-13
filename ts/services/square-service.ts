@@ -8,7 +8,7 @@ class SquareService {
         let newLine: Square[] = [];
 
         for (let i = 0; i < squaresPerLine; i++) {
-            let newNumber = MT.getRandomIntInclusive(level/2, level);
+            let newNumber = MT.getRandomIntInclusive(Math.floor(maxNumber/2), maxNumber);
 
             // debugger
             let newX = grid.grid[i].x;
