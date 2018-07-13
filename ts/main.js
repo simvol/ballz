@@ -41,13 +41,13 @@ grid = new Grid({
     numberOfLines: numberOfLines,
     objectsPerLine: squaresPerLine
 }), squares = [];
-startGame(level);
+startGame(5);
 function startGame(level) {
     points = 1;
     numberOfBalls = null;
     level = level || null;
-    step = 1;
-    squares = [];
+    step = 1,
+        squares = [];
     mover = new Mover({
         playground: { width: cWidth, height: cHeight }
     });
@@ -57,6 +57,17 @@ function startGame(level) {
         radius: 25
     });
     ball.draw();
-    mover.startMoving([ball]);
+    squares = SquareService.makeNewLine(level, grid, squaresPerLine);
+    for (var i = 0; i < squares.length; i++) {
+        if (squares[i]) {
+            painter.drawSquare(squares[i]);
+        }
+    }
+    squares.forEach(s => {
+        if (s) {
+            painter.drawSquare(s);
+        }
+    });
+    mover.startMoving([ball], squares);
 }
 //# sourceMappingURL=main.js.map

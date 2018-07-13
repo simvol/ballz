@@ -40,7 +40,6 @@ class Mover {
     public startMoving (movingObjects: Movable[], obstacles: Obstacle[]): void{
         let nextElementDelay = 0;
         this.isMoving = true;
-
         movingObjects.forEach(movObj => {
             nextElementDelay += this.nextElementDelayMS;
 
@@ -100,18 +99,53 @@ class Mover {
 
         let hasHits = Object.keys(hits).filter(h => hits[h] === true ).length > 0;
 
+        mInfo = this.prepareMoveInfo(hits, obj);
+
         //hit playground border
         if (hasHits) {
-            return this.prepareMoveInfo(hits, obj);
+            return mInfo; 
         } 
 
         //hit obsticles
-        if (obstacles) {
-            hits = this.getObstacleHits(horizontalDirection, verticalDirection, obj);
-            return this.prepareMoveInfo(hits, obj);
+        if (obstacles && obstacles.length > 0) {
+            hits = this.getObstacleHits(horizontalDirection, verticalDirection, obj, obstacles);
+
+            hasHits = Object.keys(hits).filter(h => {
+                var answer = hits[h] === true ;
+
+                return answer;
+            }).length > 0;
+
+            if (hasHits){
+
+                //!!!!
+                //If an obsticle was hit, we need to redraw squares with new colors and numbers
+
+                //TODO would be nicer to return it instead of modified things from here
+                this.hitSquare(hits.reference);
+
+                // let hits = this.getPlaygroundHits(horizontalDirection, verticalDirection, obj);
+
+                return this.prepareMoveInfo(hits, obj);
+            }
         }
 
         return mInfo;
+    }
+
+    private hitSquare(square){
+
+        //TODO START HERE
+        //Change square number,
+        //Remove square
+        //Change square color
+
+        //>>>>>
+        square.number--;
+        if (square.null <= 0) {
+            square = null;
+        }
+        console.log('hit square', square);
     }
 
     private getPlaygroundHits(
@@ -132,11 +166,57 @@ class Mover {
     private getObstacleHits(
         horizontalDirection: MOVING_DIRECTIONS,
         verticalDirection: MOVING_DIRECTIONS,
-        obj: Movable
+        obj: Movable,
+        obstacles: Obstacle[]
     ): any {
 
         //hit obsticle logic
+        //call this functions only if number of squares changes>>>
+        let allSurfs = ObstacleService.getAllSurfaces(obstacles);
+        // console.log(allSurfs);
+        //<<<
 
+        let hits = { top: null, bottom: null, left: null, right: null, reference: null };
+
+        allSurfs.map(s => {
+
+            if (verticalDirection == MOVING_DIRECTIONS.UP) {
+                var ballRightSideIsUnderSquare = obj.right > s.bl.x1;
+                var ballLeftSideIsUnderSquare = obj.left < s.bl.x2;
+
+                if (ballRightSideIsUnderSquare && ballLeftSideIsUnderSquare) { // ball is under a square in between squares X1 and X2 
+
+                    var ballTopSideHitsSquare = obj.top <= s.bl.y1;
+                    var ballIsCloseToTheBottomSide = obj.y > s.bl.y1;
+
+                    if (ballTopSideHitsSquare && ballIsCloseToTheBottomSide) {
+
+                    // drawLine(s.bl)
+
+                    // obj.yD *= -1
+
+                    //for bl X is the same as square, Y is minus square size
+                    // hitSquare(s.bl.x1, s.bl.y1 - squareSize);
+
+                        hits.top = true;
+                        hits.reference = s.reference;
+                    }
+                }
+            }
+            
+            if (verticalDirection == MOVING_DIRECTIONS.DOWN) {
+            }
+
+            if (horizontalDirection == MOVING_DIRECTIONS.LEFT) {
+            }
+            
+            if (horizontalDirection == MOVING_DIRECTIONS.RIGHT) {
+            }
+
+
+        });
+
+        return hits;
     }
 
     //MoveInfo has new directions and moving state, use it to update moving objects

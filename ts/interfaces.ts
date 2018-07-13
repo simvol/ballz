@@ -5,6 +5,7 @@ interface Color {
     a?: number;
 }
 
+//Object that can be moved in Mover class
 interface Movable {
     x: number;
     y: number;
@@ -25,12 +26,28 @@ interface Movable {
     draw: () => void;
 }
 
+//Object that can be hit by Movable in Mover calss
 interface Obstacle {
     x: number;
     y: number;
     width: number;
     height: number;
-    num: number;
+}
+
+//Line of Obstacle which can be on the way of Movable
+interface ObstacleSurfaces {
+    tl: Line,
+    bl: Line,
+    ll: Line,
+    rl: Line,
+    reference: Obstacle
+}
+
+interface Line {
+    x1: number;
+    x2: number;
+    y1: number;
+    y2: number;
 }
 
 interface MoveInfo {

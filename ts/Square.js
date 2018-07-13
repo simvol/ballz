@@ -1,7 +1,7 @@
 class Square {
-    constructor({ color, number, size, x, y }) {
+    constructor({ number, size, x, y }) {
         this.color = this.getColor(number);
-        this.num = number;
+        this.number = number;
         this.size = size;
         this.width = this.height = size;
         this.x = x;

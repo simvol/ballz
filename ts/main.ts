@@ -70,19 +70,17 @@ let canvas = document.getElementById('canvas'),
         objectsPerLine: squaresPerLine
     }),
 
-    squares = [];
+    squares: Square[] = [];
 
 
+startGame(5);
 
-
-
-startGame(level);
 
 function startGame(level?: number): void {
     points = 1;
     numberOfBalls = null;
     level = level || null; 
-    step = 1;
+    step = 1,
     squares = [];
 
     mover = new Mover({
@@ -97,5 +95,19 @@ function startGame(level?: number): void {
 
     ball.draw();
 
-    mover.startMoving([ball]);
+    squares = SquareService.makeNewLine(level, grid, squaresPerLine);
+
+    for (var i = 0; i < squares.length; i++){
+        if(squares[i]){
+            painter.drawSquare(squares[i]);
+        }
+    }
+
+    squares.forEach(s => {
+        if(s){
+            painter.drawSquare(s);
+        }
+    });
+
+    mover.startMoving([ball], squares);
 }

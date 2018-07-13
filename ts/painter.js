@@ -16,5 +16,19 @@ class Painter {
         this.context.lineTo(line.end.x, line.end.y);
         this.context.stroke();
     }
+    drawSquare(square) {
+        this.context.fillStyle = this.rgbaToString(square.color);
+        this.context.fillRect(square.x, square.y, square.size, square.size);
+        var xOffset = square.number > 10 ? 2.6 : 2.4;
+        var yOffset = 1.8;
+        this.writeNumber(square.number, square.x + squareSize / xOffset, square.y + squareSize / yOffset);
+    }
+    writeNumber(number, x, y) {
+        ctx.fillStyle = '#333';
+        ctx.fillText(number, x, y);
+    }
+    rgbaToString(rgba) {
+        return `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`;
+    }
 }
 //# sourceMappingURL=Painter.js.map
