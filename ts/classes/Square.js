@@ -7,6 +7,11 @@ class Square {
         this.x = x;
         this.y = y;
     }
+    gotHit() {
+        this.number--;
+        painter.eraseSquare(this);
+        painter.drawSquare(this);
+    }
     getColor(number) {
         let divider = 1;
         for (let i = 1; i < number.toString().length; i++) {

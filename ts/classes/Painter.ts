@@ -32,6 +32,11 @@ class Painter {
       this.writeNumber(square.number,square.x + squareSize / xOffset, square.y + squareSize / yOffset);
     }
 
+    eraseSquare(square: Square): void {
+        this.context.fillStyle = this.rgbaToString({r: 255, g: 255, b:255, a:1});
+        this.context.fillRect(square.x, square.y, square.size, square.size);
+    }
+
     private writeNumber(number, x, y) {
         ctx.fillStyle = '#333';
         ctx.fillText(number,x,y); 

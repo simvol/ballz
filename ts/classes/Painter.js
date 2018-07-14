@@ -23,6 +23,10 @@ class Painter {
         var yOffset = 1.8;
         this.writeNumber(square.number, square.x + squareSize / xOffset, square.y + squareSize / yOffset);
     }
+    eraseSquare(square) {
+        this.context.fillStyle = this.rgbaToString({ r: 255, g: 255, b: 255, a: 1 });
+        this.context.fillRect(square.x, square.y, square.size, square.size);
+    }
     writeNumber(number, x, y) {
         ctx.fillStyle = '#333';
         ctx.fillText(number, x, y);

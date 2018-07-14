@@ -16,6 +16,12 @@ class Square implements Obstacle{
         this.y = y;
     }
 
+    gotHit():void {
+      this.number--;
+      painter.eraseSquare(this);      
+      painter.drawSquare(this);      
+    }
+
     getColor(number: number): Color {
         let divider = 1;
         

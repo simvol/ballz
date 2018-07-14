@@ -103,11 +103,13 @@ function startGame(level?: number): void {
         }
     }
 
-    squares.forEach(s => {
-        if(s){
-            painter.drawSquare(s);
-        }
-    });
+    // setInterval(function(){
+    //     squares.forEach(s => {
+    //         if(s){
+    //             painter.drawSquare(s);
+    //         }
+    //     });
+    // }, 100);
 
     //TODO START HERE
     //Change square number,

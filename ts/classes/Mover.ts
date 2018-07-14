@@ -135,7 +135,8 @@ class Mover {
 
     private hitSquare(square){
 
-        square.number--;
+        square.gotHit();
+        
         if (square.number <= 0) {
             square = null;
         }
